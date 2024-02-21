@@ -138,12 +138,17 @@ function draw() {
         ctx.arc(area.x, area.y, flashlightSize, 0, 2 * Math.PI);
         ctx.fill();
     });
+    drawFlashlightBeam(mouseX, mouseY, currentColorIndex);
+
+    // Request the next frame for animation
+    requestAnimationFrame(draw);
+}
 
 function drawFlashlightBeam(x, y, colorIndex) {
     const gradient = ctx.createRadialGradient(x, y, 0, x, y, flashlightSize);
     
     // Adjust the first color stop to be brighter
-    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); // Bright white center
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)'); // Bright white center
     
     // Adjust the second color stop to make the transition smoother
     gradient.addColorStop(1, beamColors[colorIndex][0]); // Use the original color but consider adjusting the alpha if needed
