@@ -44,6 +44,28 @@ const beamColors = [
     ['rgba(0, 255, 195, 1)', 'rgba(0, 255, 195, 0)']
 ];
 
+const audioUrls = [
+    "https://audio.jukehost.co.uk/aOz6KfillnraJHw8E38nj0c8T4uJk3uG.mp3",  
+    "https://audio.jukehost.co.uk/gVJZ29CcDLHA2eu5N2ZRthH68jtWW6Gw.mp3",
+    "https://audio.jukehost.co.uk/kuI9Js3hy2kiVgojRv2yiaORL7tYYlAX.mp3",
+    "https://audio.jukehost.co.uk/hkfgqlNOAxj1LgWDOBQhRTbzxq0a3xBV.mp3",
+    "https://audio.jukehost.co.uk/lXCaYbwjVyRzckOilvVZxdg9MJOwy9xN.mp3",
+    "https://audio.jukehost.co.uk/84b4xaUM74UJaRWCbVVeUCF822yTximk.mp3",
+    "https://audio.jukehost.co.uk/e0cf53pFpqlBHa3mWIe9EFoZKNKUzjo3.mp3",
+    "https://audio.jukehost.co.uk/XTKnG2oLrq1UxCHq5yHa2hp71kkaLHAY.mp3",
+    "https://audio.jukehost.co.uk/xk3OfU1NDtUeRUQPlbcGmt8uNG3Hyr0m.mp3",
+    "https://audio.jukehost.co.uk/hB9tnsYoYcOTi70O0oi5auIU3ZL6BEJx.mp3",
+    "https://audio.jukehost.co.uk/WBe5RCJJP1vMfuaewKp1T39qm8Bm0auc.mp3",
+    "https://audio.jukehost.co.uk/Zs2Ef5WCCqJswEUHc18CjbezfCl9gseq.mp3",
+    "https://audio.jukehost.co.uk/26mQRqqYvPTbYVxegWXphWfYzPvlitOA.mp3",
+    "https://audio.jukehost.co.uk/3rJtM3HgdQKHPj6NVcsANgc39sPIlwfR.mp3",
+    "https://audio.jukehost.co.uk/vAVSRkgnD3jff7jYigFHdZlV4gxkdUfQ.mp3",
+    "https://audio.jukehost.co.uk/xHRDRPYmIWURW5h4YTpgP3zZhl24NHBn.mp3",
+    "https://audio.jukehost.co.uk/Pkce3RxLuRVE31dMiSiUqeSQt4FaamBB.mp3",
+    "https://audio.jukehost.co.uk/2gRP6adaDph5ZaHRDaBZNhiggfhPhmGa.mp3",
+    "https://audio.jukehost.co.uk/sSUTAJ1O3JYJ8nNfuV5LC55avoRySwAZ.mp3"
+];
+
 // Resize canvas to fill window
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -88,6 +110,10 @@ function placeNotes() {
             x: x,
             y: y,
             revealed: false
+            clicks: [], // Store clicked points on this note
+            audioSrc: audioUrls[index % audioUrls.length],
+            audio: new Audio(audioUrls[index % audioUrls.length]),
+            playing: false
         };
         notes.push(note);
     }
@@ -173,6 +199,15 @@ function handleClick(event) {
             clickY >= note.y && clickY <= note.y + noteSize
         ) {
             note.revealed = true; // Reveal the note
+            if (note.revealed && note.audio) {
+                if (!note.playing) {
+                    note.audio.play();
+                    note.playing = true;
+                } else {
+                    note.audio.pause();
+                    note.playing = false;
+                }
+            }
         }
     });
 }
