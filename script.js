@@ -7,6 +7,7 @@ const notes = []; // Array to hold note objects
 let mouseX = 0;
 let mouseY = 0;
 let flashlightColor = 'rgba(255, 0, 0, 0.5)'; // Initial flashlight color, red
+const revealedSpots = []; // Array to hold the spots revealed by user clicks
 
 // Resize canvas to fill window
 canvas.width = window.innerWidth;
@@ -38,6 +39,14 @@ function draw() {
         }
     });
 
+    // Draw revealed spots
+    revealedSpots.forEach(spot => {
+        ctx.fillStyle = spot.color;
+        ctx.beginPath();
+        ctx.arc(spot.x, spot.y, flashlightSize, 0, 2 * Math.PI);
+        ctx.fill();
+    });
+
     // Draw flashlight effect
     ctx.fillStyle = flashlightColor;
     ctx.beginPath();
@@ -58,6 +67,13 @@ function handleMouseMove(event) {
 function handleClick(event) {
     const clickX = event.clientX;
     const clickY = event.clientY;
+
+    // Record the spot that has been revealed by this click
+    revealedSpots.push({
+        x: clickX,
+        y: clickY,
+        color: flashlightColor
+    });
 
     notes.forEach(note => {
         if (
