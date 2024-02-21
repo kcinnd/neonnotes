@@ -196,21 +196,37 @@ function handleClick(event) {
     const clickY = event.clientY;
     let isClickOnRevealedNote = false;
 
-    // First, check if the click is on a revealed note
     notes.forEach(note => {
+        // Check if the click is within the bounds of this note
         if (
-            note.revealed &&
             clickX >= note.x && clickX <= note.x + noteSize &&
             clickY >= note.y && clickY <= note.y + noteSize
         ) {
-            isClickOnRevealedNote = true; // The click is on a revealed note
+            // For revealed notes, manage audio playback
+            if (note.revealed) {
+                isClickOnRevealedNote = true; // Mark that the click is on a revealed note
+                
+                // Toggle audio playback
+                if (!note.playing) {
+                    note.audio.play();
+                    note.playing = true;
+                } else {
+                    note.audio.pause();
+                    note.audio.currentTime = 0; // Reset audio to the start
+                    note.playing = false;
+                }
+            } else {
+                // If the note is not yet revealed, reveal it
+                note.revealed = true;
+                // Add the click point for partial reveal
+                note.clicks.push({ x: clickX, y: clickY });
+            }
         }
     });
 
-    // If the click is not on a revealed note, add the clicked area for permanent lighting
+    // Add a flashlight beam for clicks not on revealed notes
     if (!isClickOnRevealedNote) {
         clickedAreas.push({ x: clickX, y: clickY, colorIndex: currentColorIndex });
-
         // Cycle through flashlight colors for the next click
         currentColorIndex = (currentColorIndex + 1) % beamColors.length;
     }
