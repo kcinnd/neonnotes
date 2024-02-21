@@ -65,6 +65,8 @@ const audioUrls = [
     "https://audio.jukehost.co.uk/2gRP6adaDph5ZaHRDaBZNhiggfhPhmGa.mp3",
     "https://audio.jukehost.co.uk/sSUTAJ1O3JYJ8nNfuV5LC55avoRySwAZ.mp3"
 ];
+let currentColorIndex = 0; // To cycle through beam colors
+let flashlightColor = beamColors[currentColorIndex][0]; 
 
 // Resize canvas to fill window
 canvas.width = window.innerWidth;
