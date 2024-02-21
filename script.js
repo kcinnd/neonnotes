@@ -6,8 +6,30 @@ const noteSize = 100;
 const notes = []; // Array to hold note objects
 let mouseX = 0;
 let mouseY = 0;
-let flashlightColor = 'rgba(255, 0, 0, 0.5)'; // Initial flashlight color, red
-const revealedSpots = []; // Array to hold the spots revealed by user clicks
+const clickedAreas = []; // Array to hold permanently lit areas
+const beamColors = [
+    ['rgba(255, 7, 58, 1)', 'rgba(255, 7, 58, 0)'],
+    ['rgba(189, 0, 255, 1)', 'rgba(189, 0, 255, 0)'],
+    ['rgba(0, 145, 255, 1)', 'rgba(0, 145, 255, 0)'],
+    ['rgba(0, 255, 25, 1)', 'rgba(0, 255, 25, 0)'],
+    ['rgba(255, 0, 110, 1)', 'rgba(255, 0, 110, 0)'],
+    ['rgba(255, 255, 0, 1)', 'rgba(255, 255, 0, 0)'],
+    ['rgba(0, 255, 255, 1)', 'rgba(0, 255, 255, 0)'],
+    ['rgba(255, 165, 0, 1)', 'rgba(255, 165, 0, 0)'],
+    ['rgba(204, 51, 255, 1)', 'rgba(204, 51, 255, 0)'],
+    ['rgba(191, 255, 0, 1)', 'rgba(191, 255, 0, 0)'],
+    ['rgba(64, 224, 208, 1)', 'rgba(64, 224, 208, 0)'],
+    ['rgba(255, 0, 255, 1)', 'rgba(255, 0, 255, 0)'],
+    ['rgba(255, 215, 0, 1)', 'rgba(255, 215, 0, 0)'],
+    ['rgba(148, 0, 211, 1)', 'rgba(148, 0, 211, 0)'],
+    ['rgba(135, 206, 235, 1)', 'rgba(135, 206, 235, 0)'],
+    ['rgba(255, 111, 97, 1)', 'rgba(255, 111, 97, 0)'],
+    ['rgba(75, 0, 130, 1)', 'rgba(75, 0, 130, 0)'],
+    ['rgba(252, 142, 172, 1)', 'rgba(252, 142, 172, 0)'],
+    ['rgba(0, 255, 195, 1)', 'rgba(0, 255, 195, 0)'],
+];
+let currentColorIndex = 0; // To cycle through beam colors
+let flashlightColor = beamColors[currentColorIndex][0]; // Initial flashlight color
 
 // Resize canvas to fill window
 canvas.width = window.innerWidth;
@@ -39,16 +61,22 @@ function draw() {
         }
     });
 
-    // Draw revealed spots
-    revealedSpots.forEach(spot => {
-        ctx.fillStyle = spot.color;
+    // Light up previously clicked areas
+    clickedAreas.forEach(area => {
+        const gradient = ctx.createRadialGradient(area.x, area.y, 0, area.x, area.y, flashlightSize);
+        gradient.addColorStop(0, beamColors[area.colorIndex][0]);
+        gradient.addColorStop(1, beamColors[area.colorIndex][1]);
+        ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(spot.x, spot.y, flashlightSize, 0, 2 * Math.PI);
+        ctx.arc(area.x, area.y, flashlightSize, 0, 2 * Math.PI);
         ctx.fill();
     });
 
-    // Draw flashlight effect
-    ctx.fillStyle = flashlightColor;
+    // Draw flashlight effect at the current mouse position
+    const gradient = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, flashlightSize);
+    gradient.addColorStop(0, flashlightColor);
+    gradient.addColorStop(1, beamColors[currentColorIndex][1]);
+    ctx.fillStyle = gradient;
     ctx.beginPath();
     ctx.arc(mouseX, mouseY, flashlightSize, 0, 2 * Math.PI);
     ctx.fill();
@@ -68,12 +96,12 @@ function handleClick(event) {
     const clickX = event.clientX;
     const clickY = event.clientY;
 
-    // Record the spot that has been revealed by this click
-    revealedSpots.push({
-        x: clickX,
-        y: clickY,
-        color: flashlightColor
-    });
+    // Store clicked area for permanent lighting
+    clickedAreas.push({ x: clickX, y: clickY, colorIndex: currentColorIndex });
+
+    // Cycle through flashlight colors
+    currentColorIndex = (currentColorIndex + 1) % beamColors.length;
+    flashlightColor = beamColors[currentColorIndex][0];
 
     notes.forEach(note => {
         if (
@@ -82,7 +110,7 @@ function handleClick(event) {
         ) {
             note.revealed = true;
 
-            // Check if the entire note is revealed and toggle music playback
+            // Toggle music playback for the note
             if (!note.playing) {
                 // Play music logic here
                 note.playing = true;
