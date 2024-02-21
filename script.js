@@ -34,16 +34,39 @@ async function loadNoteImages() {
 
 // Function to randomly place musical notes on the canvas
 function placeNotes() {
-    noteImages.forEach((img, index) => {
+    const margin = 10; // Margin from the edges
+    const minDistance = 110; // Minimum distance between note centers to avoid clustering
+
+    for (let img of noteImages) {
+        let overlap, x, y;
+        do {
+            overlap = false;
+            // Random position with margin from edges
+            x = Math.random() * (canvas.width - noteSize - margin * 2) + margin;
+            y = Math.random() * (canvas.height - noteSize - margin * 2) + margin;
+
+            // Check against all already placed notes to avoid overlap
+            for (let note of notes) {
+                const dx = note.x - x;
+                const dy = note.y - y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < minDistance) {
+                    overlap = true;
+                    break;
+                }
+            }
+        } while (overlap); // Repeat if overlap is found
+
         const note = {
             img: img,
-            x: Math.random() * (canvas.width - noteSize),
-            y: Math.random() * (canvas.height - noteSize),
+            x: x,
+            y: y,
             revealed: false
         };
         notes.push(note);
-    });
+    }
 }
+
 
 // Function to draw the scene
 function draw() {
