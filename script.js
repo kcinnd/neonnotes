@@ -8,7 +8,6 @@ const notes = []; // Array to hold note objects with positions and revealed stat
 let mouseX = 0;
 let mouseY = 0;
 const clickedAreas = []; // Array to hold permanently lit areas
-let currentColorIndex = 0; // Index to cycle through flashlight colors
 
 // URLs of the note images
 const noteUrls = [
