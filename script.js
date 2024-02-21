@@ -43,6 +43,8 @@ const beamColors = [
     ['rgba(252, 142, 172, 1)', 'rgba(252, 142, 172, 0)'],
     ['rgba(0, 255, 195, 1)', 'rgba(0, 255, 195, 0)']
 ];
+let currentColorIndex = 0; // To cycle through beam colors
+let flashlightColor = beamColors[currentColorIndex][0]; 
 
 const audioUrls = [
     "https://audio.jukehost.co.uk/aOz6KfillnraJHw8E38nj0c8T4uJk3uG.mp3",  
@@ -65,8 +67,6 @@ const audioUrls = [
     "https://audio.jukehost.co.uk/2gRP6adaDph5ZaHRDaBZNhiggfhPhmGa.mp3",
     "https://audio.jukehost.co.uk/sSUTAJ1O3JYJ8nNfuV5LC55avoRySwAZ.mp3"
 ];
-let currentColorIndex = 0; // To cycle through beam colors
-let flashlightColor = beamColors[currentColorIndex][0]; 
 
 // Resize canvas to fill window
 canvas.width = window.innerWidth;
