@@ -157,7 +157,7 @@ function draw() {
     // Flashlight effect following the mouse with current color
     const currentBeamColor = beamColors[currentColorIndex];
     const gradient = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, flashlightSize);
-    gradient.addColorStop(0, currentBeamColor[0]);
+    gradient.addColorStop(0, flashlightColor[0]);
     gradient.addColorStop(1, currentBeamColor[1]);
     ctx.fillStyle = gradient;
     ctx.beginPath();
