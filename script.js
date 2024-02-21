@@ -144,13 +144,29 @@ function handleMouseMove(event) {
 function handleClick(event) {
     const clickX = event.clientX;
     const clickY = event.clientY;
+    let isClickOnRevealedNote = false;
 
-    // Store clicked area for permanent lighting with current color index
-    clickedAreas.push({ x: clickX, y: clickY, colorIndex: currentColorIndex });
+    // First, check if the click is on a revealed note
+    notes.forEach(note => {
+        if (
+            note.revealed &&
+            clickX >= note.x && clickX <= note.x + noteSize &&
+            clickY >= note.y && clickY <= note.y + noteSize
+        ) {
+            isClickOnRevealedNote = true; // The click is on a revealed note
+        }
+    });
 
-    // Cycle through flashlight colors for the next click
-    currentColorIndex = (currentColorIndex + 1) % beamColors.length;
+    // If the click is not on a revealed note, add the clicked area for permanent lighting
+    if (!isClickOnRevealedNote) {
+        clickedAreas.push({ x: clickX, y: clickY, colorIndex: currentColorIndex });
 
+        // Cycle through flashlight colors for the next click
+        currentColorIndex = (currentColorIndex + 1) % beamColors.length;
+    }
+
+    // Regardless of whether the note is revealed, check if the click is within the bounds of any note
+    // If so, reveal that note
     notes.forEach(note => {
         if (
             clickX >= note.x && clickX <= note.x + noteSize &&
@@ -160,6 +176,7 @@ function handleClick(event) {
         }
     });
 }
+
 
 // Initialization function
 async function init() {
