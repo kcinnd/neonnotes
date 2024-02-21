@@ -7,7 +7,8 @@ const noteImages = []; // Array to hold loaded note images
 const notes = []; // Array to hold note objects with positions and revealed status
 let mouseX = 0;
 let mouseY = 0;
-const clickedAreas = []; // Array to hold permanently lit areas
+const clickedAreas = [];
+let currentColorIndex = 0;
 
 // URLs of the note images
 const noteUrls = [
@@ -42,8 +43,6 @@ const beamColors = [
     ['rgba(252, 142, 172, 1)', 'rgba(252, 142, 172, 0)'],
     ['rgba(0, 255, 195, 1)', 'rgba(0, 255, 195, 0)']
 ];
-let currentColorIndex = 0; // To cycle through beam colors
-let flashlightColor = beamColors[currentColorIndex][0]; 
 
 const audioUrls = [
     "https://audio.jukehost.co.uk/aOz6KfillnraJHw8E38nj0c8T4uJk3uG.mp3",  
@@ -81,44 +80,30 @@ async function loadNoteImages() {
     }
 }
 
-// Function to randomly place musical notes on the canvas, ensuring no overlaps and margins
 function placeNotes() {
-    const margin = 10; // Margin from the edges
-    const minDistance = 110; // Minimum distance between note centers to avoid clustering
-
-    for (let img of noteImages) {
+    noteImages.forEach((img, index) => {
         let overlap, x, y;
         do {
             overlap = false;
-            // Random position with margin from edges
-            x = Math.random() * (canvas.width - noteSize - margin * 2) + margin;
-            y = Math.random() * (canvas.height - noteSize - margin * 2) + margin;
-
-            // Check against all already placed notes to avoid overlap
-            for (let note of notes) {
+            x = Math.random() * (canvas.width - noteSize) + noteSize / 2;
+            y = Math.random() * (canvas.height - noteSize) + noteSize / 2;
+            overlap = notes.some(note => {
                 const dx = note.x - x;
                 const dy = note.y - y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance < minDistance) {
-                    overlap = true;
-                    break;
-                }
-            }
-        } while (overlap); // Repeat if overlap is found
+                return Math.sqrt(dx * dx + dy * dy) < noteSize;
+            });
+        } while (overlap);
 
-        const note = {
+        notes.push({
             img: img,
             x: x,
             y: y,
-            revealed: false
-            clicks: [], // Store clicked points on this note
-            audioSrc: audioUrls[index % audioUrls.length],
+            revealed: false,
+            clicks: [],
             audio: new Audio(audioUrls[index % audioUrls.length]),
             playing: false
-        };
-    
-        notes.push(note);
-    }
+        });
+    });
 }
 
 // Function to draw the scene
@@ -154,7 +139,7 @@ function draw() {
         ctx.fill();
     });
 
-    // Flashlight effect following the mouse with current color
+function drawFlashlightBeam(x, y, colorIndex) {
     const currentBeamColor = beamColors[currentColorIndex];
     const gradient = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, flashlightSize);
     gradient.addColorStop(0, currentBeamColor[0]);
