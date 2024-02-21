@@ -115,6 +115,7 @@ function placeNotes() {
             audio: new Audio(audioUrls[index % audioUrls.length]),
             playing: false
         };
+    
         notes.push(note);
     }
 }
@@ -125,13 +126,19 @@ function draw() {
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw each note, if it's revealed
+    // Draw each note
     notes.forEach(note => {
-        if (note.revealed) {
-            const scale = Math.min(noteSize / note.img.width, noteSize / note.img.height);
-            const scaledWidth = note.img.width * scale;
-            const scaledHeight = note.img.height * scale;
-            ctx.drawImage(note.img, note.x, note.y, scaledWidth, scaledHeight);
+        // Draw the note partially based on the clicked areas and the flashlight beam
+        note.clicks.forEach(click => {
+            drawPartialNote(click.x, click.y, note);
+        });
+
+        // If the flashlight beam is currently over a note, draw the part of the note illuminated by the flashlight
+        if (
+            mouseX >= note.x && mouseX <= note.x + noteSize &&
+            mouseY >= note.y && mouseY <= note.y + noteSize
+        ) {
+            drawPartialNote(mouseX, mouseY, note);
         }
     });
 
@@ -158,6 +165,23 @@ function draw() {
 
     // Loop the draw function
     requestAnimationFrame(draw);
+}
+
+function drawPartialNote(x, y, note) {
+    ctx.save(); // Save the current state of the canvas context
+    ctx.beginPath();
+    ctx.arc(x, y, flashlightSize, 0, Math.PI * 2); // Define a path for the flashlight beam area
+    ctx.clip(); // Clip the drawing area to the flashlight beam path
+
+    // Calculate the scale for the note image to maintain aspect ratio within the noteSize limit
+    const scale = Math.min(noteSize / note.img.width, noteSize / note.img.height);
+    const scaledWidth = note.img.width * scale;
+    const scaledHeight = note.img.height * scale;
+
+    // Draw the image scaled and clipped to the flashlight beam area
+    ctx.drawImage(note.img, note.x, note.y, scaledWidth, scaledHeight);
+
+    ctx.restore(); // Restore the canvas context state
 }
 
 // Function to handle mouse movement
